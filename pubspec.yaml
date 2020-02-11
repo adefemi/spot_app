@@ -9,6 +9,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.2
+  flutter_svg: ^0.17.1
+  country_code_picker: ^1.2.4
+  dotted_border: ^1.0.4
+  provider: ^4.0.1
 
 dev_dependencies:
   flutter_test:
@@ -17,14 +21,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/pngs/
     - assets/svgs/
   fonts:
-    - family: Proxima
+    - family: proxima
       fonts:
         - asset: assets/fonts/proxima_ssv/ProximaNova-Regular.otf
           weight: 400
 
-    - family: Qanelas
+    - family: qanelas
       fonts:
         - asset: assets/fonts/qanelas/Qanelas-UltraLight.ttf
           weight: 100
@@ -44,4 +49,9 @@ flutter:
           weight: 800
         - asset: assets/fonts/qanelas/Qanelas-ExtraBold.ttf
           weight: 900
+
+    - family: playFairItalic
+      fonts:
+        - asset: assets/fonts/playfair/PlayfairDisplay-BoldItalic.ttf
+          weight: 800
 
