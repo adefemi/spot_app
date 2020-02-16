@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/pages/homePage/splashSub.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 
@@ -9,6 +11,7 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
+  PageController _pageController = PageController();
   bool start = false;
   @override
   void initState() {
@@ -18,38 +21,55 @@ class _SplashState extends State<Splash> {
       setState(() {
         start = true;
       });
+      moveNext();
+    });
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  void moveNext(){
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      _pageController.animateToPage(1,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeIn);
 
     });
-
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SizedBox.expand(
-        child: Stack(
-          children: <Widget>[
-            SizedBox.expand(
-              child: AnimatedContainer(
-                color: start ? colors.blueColor : colors.pinkColor,
-                duration: Duration(milliseconds: 500),
-                child: Center(
-                  child: !start ? null : Text("Spot", style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: fonts.playFairItalic,
-                    fontSize: 40
-                  ),),
+    return PageView(
+      scrollDirection: Axis.vertical,
+      controller: _pageController,
+      physics: NeverScrollableScrollPhysics(),
+      children: <Widget>[
+        Scaffold(
+          body: SizedBox.expand(
+            child: Stack(
+              children: <Widget>[
+                SizedBox.expand(
+                  child: AnimatedContainer(
+                    color: start ? colors.blueColor : colors.pinkColor,
+                    duration: Duration(milliseconds: 500),
+                    child: Center(
+                      child: !start ? null : Text("Spot", style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: fonts.playFairItalic,
+                          fontSize: 40
+                      ),),
+                    ),
+                  ),
                 ),
-              ),
+                AnimatedPositioned(
+                  duration: Duration(milliseconds: 500),
+                  child: threeDots(context),
+                  bottom: start ? 0 : MediaQuery.of(context).size.height - 200,
+                  right: start ? -30 : MediaQuery.of(context).size.width / 8,
+                ),
+              ],
             ),
-            AnimatedPositioned(
-              duration: Duration(milliseconds: 500),
-              child: threeDots(context),
-              bottom: start ? 0 : MediaQuery.of(context).size.height - 200,
-              right: start ? -30 : MediaQuery.of(context).size.width / 8,
-            ),
-          ],
+          ),
         ),
-      ),
+        SplashSub()
+      ],
     );
   }
 }

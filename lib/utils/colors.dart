@@ -15,6 +15,7 @@ class ColorList{
   Color blueColor2 = Color(0xff6AA5FF);
   Color fileSelectText = Color(0xff7C7CA2);
   Color whiteBlue = Color(0xffF5F5F5);
+  Color blueDark = Color(0xff1F1F51);
 }
 
 ColorList colors = ColorList();

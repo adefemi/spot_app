@@ -102,11 +102,11 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(height: 50,),
+                  SizedBox(height: MediaQuery.of(context).size.height/20,),
                   headingRole(context, isSideBar: true, goBack: goBack),
-                  SizedBox(height: 50,),
+                  SizedBox(height: MediaQuery.of(context).size.height/20,),
                   textControl("Hassan Stores", size: 20, fontWeight: FontWeight.w600, color: Colors.white),
-                  SizedBox(height: 70,),
+                  SizedBox(height: MediaQuery.of(context).size.height/15,),
                   sideBarLinks(
                       context,
                       icon: "store.svg",
@@ -137,7 +137,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                       icon: "addNew.svg",
                       title: "Create New Offer"
                   ),
-                  SizedBox(height: 50,),
+                  SizedBox(height: MediaQuery.of(context).size.height/20,),
                   sideBarLinks(
                       context,
                       icon: "setting.svg",
@@ -193,7 +193,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                 }
               },
               child: Container(
-                width: 10,
+                width: 30,
                 color: Colors.transparent,
               ),
             )

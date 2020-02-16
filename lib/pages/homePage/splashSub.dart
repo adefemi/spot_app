@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:spot_app/components/splashControl.dart';
 import 'package:spot_app/components/splashSubComponent.dart';
 import 'package:spot_app/components/splashText.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/pages/selectRole/selectRole.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,6 +23,7 @@ class _SplashSubState extends State<SplashSub> {
   @override
   void initState() {
     super.initState();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   void switchScreen(){
@@ -98,13 +101,18 @@ class _SplashSubState extends State<SplashSub> {
                       top: -50,
                     ),
                     Positioned(
-                      child: Text("Skip", style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontFamily: fonts.proxima
-                      ),),
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.of(context).pushNamed("/roleSelect");
+                        },
+                        child: Text("Skip", style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontFamily: fonts.proxima
+                        ),),
+                      ),
                       right: 40,
-                      top: 80,
+                      top: MediaQuery.of(context).size.height/15,
                     )
                   ],
                 ),
@@ -113,7 +121,7 @@ class _SplashSubState extends State<SplashSub> {
                 width: MediaQuery.of(context).size.width ,
                 height: splashContentHeight,
                 margin: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height/4.5),
+                    top: MediaQuery.of(context).size.height/6),
                 child: SizedBox.expand(
                   child: ListView(
                     controller: _scrollController,
@@ -130,7 +138,7 @@ class _SplashSubState extends State<SplashSub> {
               Positioned(
                 child: Container(
                   margin: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height/4.5),
+                      top: MediaQuery.of(context).size.height/6),
                   height: splashContentHeight,
                   child: Center(
                     child: AnimatedSwitcher(
@@ -144,66 +152,82 @@ class _SplashSubState extends State<SplashSub> {
                 ),
               ),
               Positioned(
-                  top: MediaQuery.of(context).size.height / 1.35,
+                  bottom: 0,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Center(
-                          child: AnimatedSwitcher(
-                            duration: Duration(milliseconds: 500),
-                            child: splashText(
-                                _contentList[scrollState],
-                                key: ValueKey(scrollState)
+                        Column(
+                          children: <Widget>[
+                            Center(
+                              child: AnimatedSwitcher(
+                                duration: Duration(milliseconds: 500),
+                                child: splashText(
+                                    _contentList[scrollState],
+                                    key: ValueKey(scrollState)
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        Center(
-                          child: AnimatedSwitcher(
-                            duration: Duration(milliseconds: 500),
-                            child: splashText(_contentList[scrollState],
-                                head: false,
-                                key: ValueKey(scrollState)
+                            Center(
+                              child: AnimatedSwitcher(
+                                duration: Duration(milliseconds: 500),
+                                child: splashText(_contentList[scrollState],
+                                    head: false,
+                                    key: ValueKey(scrollState)
+                                ),
+                              ),
                             ),
-                          ),
+                            SizedBox(height: MediaQuery.of(context).size.height/15,),
+
+                          ],
                         ),
-                        SizedBox(height: 50,),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: MediaQuery.of(context).size.width / 9
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Row(
+                        Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: MediaQuery.of(context).size.width / 9
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  splashControl((){onTapControl(0);}, active: scrollState == 0 && true),
-                                  splashControl((){onTapControl(1);},active: scrollState == 1 && true),
-                                  splashControl((){onTapControl(2);},active: scrollState == 2 && true),
+                                  Row(
+                                    children: <Widget>[
+                                      splashControl((){onTapControl(0);}, active: scrollState == 0 && true),
+                                      splashControl((){onTapControl(1);},active: scrollState == 1 && true),
+                                      splashControl((){onTapControl(2);},active: scrollState == 2 && true),
+                                    ],
+                                  ),
+                                  Hero(
+                                    tag: "goRole",
+                                    child: GestureDetector(
+                                      onTap: scrollState == 2 ? (){
+                                        Navigator.of(context).pushNamed("/roleSelect");
+                                      } :goNext,
+                                      child: Container(
+                                        width: 118,
+                                        height: 62,
+                                        decoration: BoxDecoration(
+                                            color: colors.blueColor,
+                                            borderRadius: BorderRadius.circular(40)
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.chevron_right,
+                                            color: Colors.white,
+                                            size: 30,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+
                                 ],
                               ),
-                              GestureDetector(
-                                onTap: scrollState == 2 ? (){} :goNext,
-                                child: Container(
-                                  width: 118,
-                                  height: 62,
-                                  decoration: BoxDecoration(
-                                      color: colors.blueColor,
-                                      borderRadius: BorderRadius.circular(40)
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.chevron_right,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                  ),
-                                ),
-                              )
-
-                            ],
-                          ),
-                        )
+                            ),
+                            SizedBox(height: 20,)
+                          ],
+                        ),
                       ],
                     ),
                   )
