@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:spot_app/components/headingRole.dart';
+import 'package:spot_app/components/sideBarLinks.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:spot_app/utils/helpers.dart';
 
 class SideBarControl extends StatefulWidget {
   const SideBarControl(this._child);
@@ -87,61 +89,75 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
           children: <Widget>[
             bgSideBar(),
             Positioned(
-              bottom: -150,
-              right: 10,
+              bottom: -getSize(context, 150),
+              right: getSize(context, 10),
               child: Transform(
                 alignment: Alignment.center,
-                transform: Matrix4.rotationZ(-60 * 3.142/180),
-                child: Transform.scale(scale: 1.5,
+                transform: Matrix4.rotationZ(-getSize(context, 60) * 3.142/180),
+                child: Transform.scale(scale: getSize(context, 1.5),
                   child: threeDots(context, color: Colors.white.withOpacity(0.05)),),),
             ),
             Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width / 10
+                  horizontal: getWidth(context) / 10
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  SizedBox(height: MediaQuery.of(context).size.height/20,),
-                  headingRole(context, isSideBar: true, goBack: goBack),
-                  SizedBox(height: MediaQuery.of(context).size.height/20,),
-                  textControl("Hassan Stores", size: 20, fontWeight: FontWeight.w600, color: Colors.white),
-                  SizedBox(height: MediaQuery.of(context).size.height/15,),
-                  sideBarLinks(
-                      context,
-                      icon: "store.svg",
-                      title: "My Dashboard"
+                  Column(
+                    children: <Widget>[
+                      SizedBox(height: getHeight(context)/20,),
+                      headingRole(context, isSideBar: true, goBack: goBack),
+                    ],
                   ),
-                  sideBarLinks(
-                      context,
-                      icon: "cart.svg",
-                      title: "My Offers"
-                  ),
-                  sideBarLinks(
-                      context,
-                      icon: "user.svg",
-                      title: "Visiting Spotters"
-                  ),
-                  sideBarLinks(
-                      context,
-                      icon: "chat.svg",
-                      title: "Chats"
-                  ),
-                  sideBarLinks(
-                      context,
-                      icon: "barcode.svg",
-                      title: "Scan Barcode"
-                  ),
-                  sideBarLinks(
-                      context,
-                      icon: "addNew.svg",
-                      title: "Create New Offer"
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height/20,),
+                  textControl("Hassan Stores", context, size: getSize(context, 20), fontWeight: FontWeight.w600, color: Colors.white),
+                 Column(
+                   children: <Widget>[
+                     sideBarLinks(
+                         context,
+                         icon: "store.svg",
+                         title: "My Dashboard",
+                         onTap: () => gotoPage(context, "/dashboard2")
+                     ),
+                     sideBarLinks(
+                         context,
+                         icon: "cart.svg",
+                         title: "My Offers",
+                         onTap: () => gotoPage(context, "/dashboard2", extra: 1)
+                     ),
+                     sideBarLinks(
+                         context,
+                         icon: "user.svg",
+                         title: "Visiting Spotters",
+                         onTap: () => gotoPage(context, "/visiting", )
+                     ),
+                     sideBarLinks(
+                         context,
+                         icon: "chat.svg",
+                         title: "Chats",
+                         onTap: () => gotoPage(context, "/dashboard2", extra: 2)
+                     ),
+                     sideBarLinks(
+                         context,
+                         icon: "barcode.svg",
+                         title: "Scan Barcode",
+                         onTap: () => gotoPage(context, "/barcodeScanner")
+                     ),
+                     sideBarLinks(
+                         context,
+                         icon: "addNew.svg",
+                         title: "Create New Offer",
+                         onTap: () => gotoPage(context, "/newOffer")
+                     ),
+                     SizedBox(height: getHeight(context)/20,),
+                   ],
+                 ),
                   sideBarLinks(
                       context,
                       icon: "setting.svg",
-                      title: "Settings"
+                      title: "Settings",
+                      onTap: () => gotoPage(context, "/settingsMain")
                   ),
                 ],
               ),
@@ -151,7 +167,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                   scale: tween2.animate(_animation),
                   alignment: Alignment.centerRight,
                   child:  ClipRRect(
-                    borderRadius: BorderRadius.circular(isOpen ? 20 : 0),
+                    borderRadius: BorderRadius.circular(isOpen ? getSize(context, 20) : 0),
                     child: Container(
                       decoration: BoxDecoration(
                           color: colors.whiteBlue.withOpacity(0.37)
@@ -166,10 +182,10 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                   scale: tween.animate(_animation),
                   alignment: Alignment.centerRight,
                   child:  ClipRRect(
-                    borderRadius: BorderRadius.circular(isOpen ? 20 : 0),
+                    borderRadius: BorderRadius.circular(isOpen ? getSize(context, 20) : 0),
                     child: GestureDetector(
                       onHorizontalDragUpdate: (details){
-                        if(details.delta.dx < 20){
+                        if(details.delta.dx < getSize(context, 20)){
                           if(isOpen){
                             goBack();
                           }
@@ -179,7 +195,9 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                         decoration: BoxDecoration(
                           color: Colors.white,
                         ),
-                        child: widget._child(openSideBar)
+                        child: isOpen ?
+                        AbsorbPointer(child: widget._child(openSideBar),) :
+                        widget._child(openSideBar)
                       ),
                     ),
                   )
@@ -193,7 +211,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                 }
               },
               child: Container(
-                width: 30,
+                width: getSize(context, 30),
                 color: Colors.transparent,
               ),
             )
@@ -207,18 +225,5 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
 Widget bgSideBar(){
   return Container(
     color: colors.blueColor,
-  );
-}
-
-Widget sideBarLinks(BuildContext context, {String title: "", String icon: ""}){
-  return Container(
-    margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 17),
-    child: Row(
-      children: <Widget>[
-        SvgPicture.asset("assets/svgs/$icon", color: Colors.white,),
-        SizedBox(width: 20,),
-        textControl(title, size: 16, fontWeight: FontWeight.w500, color: Colors.white)
-      ],
-    ),
   );
 }

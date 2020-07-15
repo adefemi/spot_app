@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:spot_app/utils/colors.dart';
+import 'package:spot_app/utils/helpers.dart';
 
 Widget splashSubComponent(BuildContext context,
     {bool first = false, bool last = false}){
 
   EdgeInsets margin = EdgeInsets.symmetric(
-      vertical: 10,
-      horizontal: (MediaQuery.of(context).size.width -
-          MediaQuery.of(context).size.width / 1.4) /6);
+      vertical: getSize(context, 10),
+      horizontal: (getWidth(context) -
+          getWidth(context) / 1.4) /6);
 
   if(first){
     margin = EdgeInsets.only(

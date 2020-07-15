@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 
-Widget headingRole(BuildContext context, {bool isSideBar: false, Function goBack, bool canGoBack: false}){
+Widget headingRole(BuildContext context, {bool isSideBar: false, Function goBack, bool canGoBack: false, Widget child}){
   Color color = colors.blueColor;
   if(isSideBar){
     color = Colors.white;
@@ -10,11 +10,11 @@ Widget headingRole(BuildContext context, {bool isSideBar: false, Function goBack
   return  Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: <Widget>[
-      Text("Spot", style: TextStyle(
-          fontFamily: fonts.playFairItalic,
-          fontSize: 22,
-          color: color
-      ),),
+     child == null ?  Text("Spot", style: TextStyle(
+         fontFamily: fonts.playFairItalic,
+         fontSize: 22,
+         color: color
+     ),) : child,
       !isSideBar ?
       GestureDetector(
         onTap: (){

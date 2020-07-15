@@ -11,9 +11,11 @@ import 'package:spot_app/components/selectRoleBox.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
 import 'package:spot_app/models/options.dart';
+import 'package:spot_app/provider/systemMount.dart';
 import 'package:spot_app/provider/userOnBoardModel.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
+import 'package:spot_app/utils/helpers.dart';
 
 class SelectRole extends StatefulWidget {
   @override
@@ -34,7 +36,15 @@ class _SelectRoleState extends State<SelectRole> {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
+  void selectRole(String activeRole, List roles, UserOnBoardChangeNotifierModel model){
+//    final roleObj = roles.where((item) => item["name"].toString().toLowerCase() == activeRole.toLowerCase()).toList()[0];
+//    model.changeRole(activeRole, roleObj["id"]);
+    model.changeRole(activeRole, _selectedRole);
+  }
+
   Widget build(BuildContext context) {
+    final roles = Provider.of<SystemMount>(context);
+    bool loading = false;//roles.roles == null ? true : false;
     return Scaffold(
       body:SizedBox.expand(
         child:  Stack(
@@ -42,51 +52,52 @@ class _SelectRoleState extends State<SelectRole> {
             bgColorLayer(),
             Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width / 10
+                  horizontal: getWidth(context) / 10
               ),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    SizedBox(height: 50,),
+                    SizedBox(height: getSize(context, 50),),
                     headingRole(context),
-                    SizedBox(height: 50,),
+                    SizedBox(height: getSize(context, 50),),
 
-                    textControl("Hello &", size: 25, fontWeight: FontWeight.w500),
-                    SizedBox(height: 10,),
-                    textControl("Welcome", size: 30, fontWeight: FontWeight.w700),
-                    SizedBox(height: 10,),
-                    circle(10, color: colors.pinkColor),
-                    SizedBox(height: 30,),
-                    textControl("Create your account", size: 20, fontWeight: FontWeight.w700),
-                    SizedBox(height: 40,),
-                    textControl("Select Role", size: 17, font: fonts.proxima, fontWeight: FontWeight.w500),
-                    SizedBox(height: 20,),
+                    textControl("Hello &", context, size: getSize(context, 25), fontWeight: FontWeight.w500),
+                    SizedBox(height: getSize(context, 10),),
+                    textControl("Welcome", context, size: getSize(context, 30), fontWeight: FontWeight.w700),
+                    SizedBox(height: getSize(context, 10),),
+                    circle(getSize(context, 10), color: colors.pinkColor),
+                    SizedBox(height: getSize(context, 30),),
+                    textControl("Create your account", context, size: getSize(context, 20), fontWeight: FontWeight.w700),
+                    SizedBox(height: getSize(context, 40),),
+                    textControl("Select Role", context, size: getSize(context, 17), font: fonts.proxima, fontWeight: FontWeight.w500),
+                    SizedBox(height: getSize(context, 20),),
                     Consumer<UserOnBoardChangeNotifierModel>(
                       builder: (context, model, child){
                         return Container(
-                          height: MediaQuery.of(context).size.height / 3.5 > 200 ? 200 : MediaQuery.of(context).size.height / 3.5,
+                          height: getSize(context, 200),
                           child: Flex(
                             direction: Axis.horizontal,
                             children: <Widget>[
-                              selectRoleBox(
+                              selectRoleBox(context,
                                   "assets/svgs/spotter.svg", "Spotter",
-                                  imageWidth: MediaQuery.of(context).size.height / 25 > 30 ?
-                                  30 : MediaQuery.of(context).size.height / 25,
+                                  imageWidth: getSize(context, 30),
                                   active: _selectedRole == spotRoles.spotter,
                                   onTap: (){
+                                    if(loading) return;
                                     _roleSelect(spotRoles.spotter);
-                                    model.changeRole(spotRoles.spotter);
+                                    selectRole(spotRoles.spotter, roles.roles, model);
                                   }
                               ),
                               selectRoleBox(
+                                context,
                                   "assets/svgs/merchant.svg", "Merchant",
-                                  imageWidth: MediaQuery.of(context).size.height / 17 > 50 ?
-                                  50 : MediaQuery.of(context).size.height / 17, first: false,
+                                  imageWidth: getSize(context, 45), first: false,
                                   active: _selectedRole == spotRoles.merchant,
                                   onTap: (){
+                                    if(loading) return;
                                     _roleSelect(spotRoles.merchant);
-                                    model.changeRole(spotRoles.merchant);
+                                    selectRole(spotRoles.merchant, roles.roles, model);
                                   }
                               ),
                             ],
@@ -94,37 +105,41 @@ class _SelectRoleState extends State<SelectRole> {
                         );
                       },
                     ),
-                    SizedBox(height: 60,),
+                    SizedBox(height: getSize(context, 60),),
                     Center(
                       child:  Stack(
                         children: <Widget>[
                           Hero(
                             tag: "goRole",
-                            child: simpleButton("Continue"),
+                            child: Material(type: MaterialType.transparency,child: simpleButton("Continue", context)),
                           ),
                           Hero(
                             tag: "goPhone",
-                            child: simpleButton("Continue", onTap: (){
-                              if(_selectedRole == null){
-                                Fluttertoast.showToast(
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: simpleButton("Continue", context, loading: loading, onTap: (){
+                                if(loading) return;
+                                if(_selectedRole == null){
+                                  Fluttertoast.showToast(
                                     msg: "You need to select a role!",
-                                );
-                              }
-                              else{
-                                Navigator.of(context).pushNamed("/phoneSetup");
-                              }
-                            }),
+                                  );
+                                }
+                                else{
+                                  Navigator.of(context).pushNamed("/phoneSetup");
+                                }
+                              }),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 20,),
+                    SizedBox(height: getSize(context, 20),),
 
                     Center(
-                      child: textControl("Already have an account",
-                          size: 16, font: fonts.proxima, color: colors.pinkColor, underline: true),
+                      child: textControl("Already have an account", context,
+                          size: getSize(context, 16), font: fonts.proxima, color: colors.pinkColor, underline: true),
                     ),
-                    SizedBox(height: 20,)
+                    SizedBox(height: getSize(context, 20),)
                   ],
                 ),
               ),

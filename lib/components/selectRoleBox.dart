@@ -5,7 +5,7 @@ import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 
 
-Widget selectRoleBox(String imageAsset, String text, {double imageWidth: 40, bool first: true, double paddingTop: 30, bool active: false, Function onTap, double scaleFactor = 1}){
+Widget selectRoleBox(BuildContext context, String imageAsset, String text, {double imageWidth: 40, bool first: true, double paddingTop: 30, bool active: false, Function onTap, double scaleFactor = 1}){
   return Flexible(
     flex: 1,
     child: GestureDetector(
@@ -21,7 +21,7 @@ Widget selectRoleBox(String imageAsset, String text, {double imageWidth: 40, boo
           child: Column(
             children: <Widget>[
               textControl(
-                  text, size: 16,
+                  text, context, size: 16,
                   color: active ? Colors.white : Colors.black.withOpacity(0.5),
                   font: fonts.proxima),
               SizedBox(height: paddingTop,),

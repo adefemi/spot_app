@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:spot_app/utils/helpers.dart';
 
 Widget threeDots(BuildContext context, {Color color}){
   if (color == null){
     color = Colors.white.withOpacity(0.12);
   }
   return Container(
-    width: 250,
-    height: 250,
+    width: getSize(context, 250),
+    height: getSize(context, 250),
     child: Stack(
       children: <Widget>[
         Positioned(
-          child: circle(90, color: color),
-          left: 100,
-          top: 120,
+          child: circle(getSize(context, 90), color: color),
+          left: getSize(context, 100),
+          top: getSize(context, 120),
         ),
         Positioned(
-          child: circle(35, color: color),
-          left: 120,
-          top: 60,
+          child: circle(getSize(context, 35), color: color),
+          left: getSize(context, 120),
+          top: getSize(context, 60),
         ),
         Positioned(
-          child: circle(60, color: color),
-          left: 30,
-          top: 30,
+          child: circle(getSize(context, 60), color: color),
+          left: getSize(context, 30),
+          top: getSize(context, 30),
         ),
         Positioned(
-          child: circle(70, color: color),
-          right: 20,
-          top: 0,
+          child: circle(getSize(context, 70), color: color),
+          right: getSize(context, 20),
+          top: getSize(context, 0),
         ),
       ],
     ),
@@ -42,7 +43,7 @@ Widget circle(double radius, {Color color}){
     width: radius,
     height: radius,
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(radius),
       color: color,
     ),
   );

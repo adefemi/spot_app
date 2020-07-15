@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:spot_app/components/countrySelect.dart';
-import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
+import 'package:spot_app/utils/helpers.dart';
 
 class NumberTextInputFormatter extends TextInputFormatter{
   @override
@@ -36,12 +36,12 @@ class NumberTextInputFormatter extends TextInputFormatter{
 }
 final _mobileFormatter = NumberTextInputFormatter();
 
-Widget phoneInputField({String value: "", Function setValue, bool isCorrect: false}){
+Widget phoneInputField(BuildContext context, {String value: "", Function setValue, bool isCorrect: false}){
   return Container(
-    height: 82,
+    height: getSize(context, 82),
     decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(getSize(context, 20)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withOpacity(0.01),
@@ -51,7 +51,7 @@ Widget phoneInputField({String value: "", Function setValue, bool isCorrect: fal
           )
         ]
     ),
-    padding: EdgeInsets.symmetric(horizontal: 20),
+    padding: EdgeInsets.symmetric(horizontal: getSize(context, 20)),
     child: Center(
       child: Flex(
         direction: Axis.horizontal,
@@ -71,7 +71,7 @@ Widget phoneInputField({String value: "", Function setValue, bool isCorrect: fal
                 setValue(newValue);
               },
               style: TextStyle(
-                fontSize: 17,
+                fontSize: getSize(context, 17),
                 fontFamily: fonts.qanelas,
                 fontWeight: FontWeight.w600,
                 color: colors.blueColor
@@ -80,8 +80,9 @@ Widget phoneInputField({String value: "", Function setValue, bool isCorrect: fal
                   border: InputBorder.none,
                   hintText: '803 344 8299',
                 hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.3),
                   fontWeight: FontWeight.w500,
-                  fontSize: 15
+                  fontSize: getSize(context, 15)
                 )
               ),
             ),
@@ -90,13 +91,13 @@ Widget phoneInputField({String value: "", Function setValue, bool isCorrect: fal
             duration: Duration(milliseconds: 300),
             opacity: isCorrect ? 1 : 0,
             child: Container(
-              width: 26,
-              height: 26,
+              width: getSize(context, 26),
+              height: getSize(context, 26),
               decoration: BoxDecoration(
                   color: colors.blueLight,
-                  borderRadius: BorderRadius.circular(40)
+                  borderRadius: BorderRadius.circular(getSize(context, 40))
               ),
-              child: Icon(Icons.check, size: 14, color: Colors.white,),
+              child: Icon(Icons.check, size: getSize(context, 14), color: Colors.white,),
             ),
           )
         ],
@@ -105,9 +106,9 @@ Widget phoneInputField({String value: "", Function setValue, bool isCorrect: fal
   );
 }
 
-Widget otpInputField({double borderRadius: 15, double height: 82, Function onChange, bool isFocused = false, FocusNode otpFocusNode, bool isFirst: false}){
+Widget otpInputField(BuildContext context, {double borderRadius: 15, double height: 82, Function onChange, bool isFocused = false, FocusNode otpFocusNode, bool isFirst: false}){
   return Container(
-      height: height,
+      height: getSize(context, height),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -120,11 +121,11 @@ Widget otpInputField({double borderRadius: 15, double height: 82, Function onCha
           )
         ]
       ),
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: getSize(context, 20)),
       child: Center(
         child: TextField(
           style: TextStyle(
-              fontSize: 18,
+              fontSize: getSize(context, 18),
               fontFamily: fonts.proxima,
               fontWeight: FontWeight.w600,
               color: colors.blueColor
@@ -147,9 +148,9 @@ Widget otpInputField({double borderRadius: 15, double height: 82, Function onCha
   );
 }
 
-Widget textInputField({double borderRadius: 15, double height: 82, Function onChange, String placeholder:"Enter something", FocusNode focusNode, String errorText}){
+Widget textInputField(BuildContext context, {double borderRadius: 15, double height: 82, Function onChange, String placeholder:"Enter something", FocusNode focusNode, String errorText, bool multiLine: false}){
   return Container(
-      height: height,
+      height: getSize(context, height),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -162,32 +163,38 @@ Widget textInputField({double borderRadius: 15, double height: 82, Function onCh
           )
         ]
       ),
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: getSize(context, 20)),
       child: Center(
         child: TextField(
           style: TextStyle(
-              fontSize: 16,
+              fontSize: getSize(context, 16),
               fontFamily: fonts.proxima,
               fontWeight: FontWeight.w500,
               color: Colors.black
           ),
           onChanged: onChange,
-          keyboardType: TextInputType.number,
           focusNode: focusNode,
+          keyboardType: multiLine ? TextInputType.multiline : TextInputType.text,
+          maxLines: multiLine ? 5 : 1,
           decoration: InputDecoration(
             border: InputBorder.none,
             errorText: errorText,
             counterText: "",
-              hintText: placeholder
+              hintText: placeholder,
+              hintStyle: TextStyle(
+                  fontSize: getSize(context, 15),
+                  fontFamily: fonts.proxima,
+                  color: Colors.black.withOpacity(0.3)
+              )
           ),
         ),
       ),
   );
 }
 
-Widget inputSelectField({double borderRadius: 15, String placeholder, String value, List<String> itemList, Function onSelect, double height: 82}){
+Widget inputSelectField(BuildContext context, {double borderRadius: 15, String placeholder, String value, List<String> itemList, Function onSelect, double height: 82}){
   return Container(
-      height: height,
+      height: getSize(context, height < 75 ? 75 : height),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -200,7 +207,7 @@ Widget inputSelectField({double borderRadius: 15, String placeholder, String val
           )
         ]
       ),
-      padding: EdgeInsets.symmetric(horizontal: 30),
+      padding: EdgeInsets.symmetric(horizontal: getSize(context, 30)),
       child: DropdownButtonFormField(
         onChanged: onSelect,
         value: value,
@@ -209,16 +216,16 @@ Widget inputSelectField({double borderRadius: 15, String placeholder, String val
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide.none
           ),
-              hintText: placeholder,
+            hintText: placeholder,
           hintStyle: TextStyle(
-            fontSize: 15,
+            fontSize: getSize(context, 15),
             fontFamily: fonts.proxima,
             color: Colors.black.withOpacity(0.3)
           )
         ),
-        iconSize: 20,
+        iconSize: getSize(context, 20),
         style: TextStyle(
-            fontSize: 15,
+            fontSize: getSize(context, 15),
             fontFamily: fonts.proxima,
             color: Colors.black
         ),
@@ -231,5 +238,21 @@ Widget inputSelectField({double borderRadius: 15, String placeholder, String val
         }).toList(),
         isExpanded: true,
       )
+  );
+}
+
+Widget sliderWidget(BuildContext context, {Function onSelect, double value, double min:1, double max: 10}){
+  return Slider(
+      value: value,
+      min: min,
+      max: max,
+      divisions: null,
+      activeColor: colors.pinkColor,
+      inactiveColor: colors.blueLight2,
+      label: 'Set a value',
+      onChanged: onSelect,
+      semanticFormatterCallback: (double newValue) {
+        return '${newValue}km';
+      }
   );
 }
