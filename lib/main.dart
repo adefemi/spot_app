@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spot_app/components/sideBarLayer.dart';
 import 'package:spot_app/components/sideBarLayer2.dart';
+import 'package:spot_app/components/webViewSample.dart';
 import 'package:spot_app/pages/chatPage/chatPad.dart';
 import 'package:spot_app/pages/chatPage/chatSearch.dart';
 import 'package:spot_app/pages/homePage/splash.dart';
 import 'package:spot_app/pages/offerPage/explore.dart';
+import 'package:spot_app/pages/offerPage/mall.dart';
 import 'package:spot_app/pages/offerPage/newOffer.dart';
 import 'package:spot_app/pages/offerPage/offerDeals.dart';
 import 'package:spot_app/pages/offerPage/productView.dart';
@@ -30,6 +32,7 @@ import 'package:spot_app/pages/storePage/dashboardMain2.dart';
 import 'package:spot_app/pages/storePage/payment.dart';
 import 'package:spot_app/provider/systemMount.dart';
 import 'package:spot_app/provider/userOnBoardModel.dart';
+import 'package:uni_links/uni_links.dart';
 
 void main(){
   SystemMount systemMount = SystemMount();
@@ -49,9 +52,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: "/",
       routes: {
-        "/": (context) => Splash(),
         "/roleSelect": (context) => SelectRole(),
         "/phoneSetup": (context) => PhoneSetup(),
         "/otpSetup": (context) => OtpSetup(),
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
         "/productView": (context) => SideBarControl((Function showSideBar) => ProductView(showSideBar)),
         "/visiting": (context) => SideBarControl((Function showSideBar) => VisitingSpotter(showSideBar)),
         "/dashboard": (context) => SideBarControl2((Function showSideBar) => Dashboard2(showSideBar)),
+        "/mall": (context) => SideBarControl2((Function showSideBar) => Mall(showSideBar)),
         "/dashboard2": (context) => SideBarControl((Function showSideBar) => Dashboard(showSideBar)),
         "/explore": (context) => SideBarControl2((Function showSideBar) => Explore(showSideBar)),
         "/payment": (context) => SideBarControl2((Function showSideBar) => PaymentMain(showSideBar)),
@@ -78,6 +80,19 @@ class MyApp extends StatelessWidget {
         "/tenantProfile": (context) => TenantProfile(),
         "/userInterest": (context) => UserInterest(),
       },
+      home: StreamBuilder(
+        stream: getLinksStream(),
+        builder: (context, snapshot){
+          if(snapshot.hasData){
+            var uri = Uri.parse(snapshot.data);
+            var list = uri.queryParametersAll.entries.toList();
+            return Splash();
+          }
+          else{
+            return Splash();
+          }
+        },
+      ),
     );
   }
 }

@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/helpers.dart';
 
-Widget alertViewer(BuildContext context, {bool status: false, Widget child, Function closeAlert}){
+Widget alertViewer(BuildContext context, {bool status: false, bool canClose: true, Widget child, Function closeAlert}){
   return IgnorePointer(
    ignoring: !status,
     child: Stack(
       children: <Widget>[
         GestureDetector(
-          onTap: closeAlert,
+          onTap: (){
+            if(canClose)closeAlert();
+          },
           child: AnimatedContainer(
             duration: Duration(milliseconds: 300),
             height: getHeight(context),

@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 double getHeight(BuildContext context){
   return MediaQuery.of(context).size.height;
@@ -8,6 +7,11 @@ double getHeight(BuildContext context){
 
 double getWidth(BuildContext context){
   return MediaQuery.of(context).size.width;
+}
+
+void printWrapped(String text) {
+  final pattern = new RegExp('.{1,800}'); // 800 is the size of each chunk
+  pattern.allMatches(text).forEach((match) => print(match.group(0)));
 }
 
 double getSize(BuildContext context, double maxSize){
@@ -52,3 +56,9 @@ void gotoPage(BuildContext context, String link, {int extra, bool repNamed: true
     }
   }
 }
+
+const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+Random _rnd = Random();
+
+String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+    length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));

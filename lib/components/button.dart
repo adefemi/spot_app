@@ -13,12 +13,16 @@ Widget simpleButton(
       Color backColor, Color color, FontWeight fontWeight,
       Function onTap,
       bool loading = false,
+      bool disabled = false,
       Color loaderColor,
       Widget child
     }
     ){
   return GestureDetector(
-    onTap: onTap,
+    onTap: (){
+      if(disabled)return;
+        onTap();
+    },
     child: Container(
       height: getSize(context, padV),
       width: getSize(context, padH),
@@ -32,7 +36,7 @@ Widget simpleButton(
             fontWeight: fontWeight == null ? FontWeight.w600 : fontWeight):child,
       ),
       decoration: BoxDecoration(
-          color: backColor == null ? colors.blueColor : backColor,
+          color: disabled ? Colors.grey :backColor == null ? colors.blueColor : backColor,
           borderRadius: BorderRadius.circular(borderRadius)
       ),
     ),

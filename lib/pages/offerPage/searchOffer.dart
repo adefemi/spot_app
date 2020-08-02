@@ -1,9 +1,11 @@
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spot_app/components/bgColorLayer.dart';
 import 'package:spot_app/components/headingRole2.dart';
 import 'package:spot_app/components/searchPanel.dart';
 import 'package:spot_app/components/sideBarLayer2.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
 import 'package:spot_app/pages/storePage/dashboardMain2.dart';
 import 'package:spot_app/provider/userOnBoardModel.dart';
 import 'package:spot_app/utils/colors.dart';
@@ -40,7 +42,7 @@ class _SearchOfferState extends State<SearchOffer> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(left: getWidth(context)/10, right: getWidth(context)/10, top: getSize(context, 30), bottom: getSize(context, 20)),
-                        child: headingRole2(context, "Hello World", colorMain: colors.blueColor3, solid: true, togNav: widget.showSideBar),
+                        child: headingRole2(context, StringUtils.capitalize(activeUser(context, content: "name")), colorMain: colors.blueColor3, solid: true, togNav: widget.showSideBar),
                       ),
                       SearchPanel(moveToPage: moveToPage,),
                     ],

@@ -13,6 +13,7 @@ import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
 import 'package:spot_app/models/errorHandler.dart';
 import 'package:spot_app/models/options.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
 import 'package:spot_app/network/data.dart';
 import 'package:spot_app/network/requestManage.dart';
 import 'package:spot_app/provider/userOnBoardModel.dart';
@@ -64,43 +65,22 @@ class _AboutUserState extends State<AboutUser> {
   }
 
   void submit(Function callback) async{
-    callback();
-    return;
     // update user data
     Map updateData = {
       "name": userName,
       "gender": _selectedGender,
       "roleId": Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false).activeRoleId
     };
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString(spotPrefs.token);
-    String userId = prefs.getString(spotPrefs.userId);
-    Map<String, String> headers = networkData.setHeader(userBearer: true, userJson: true, token: token);
-    String newUrl = networkData.getUsersUrl() + "/$userId";
-    HttpRequests httpRequests = HttpRequests(url: newUrl, body: jsonEncode(updateData), headers: headers);
     setState(() {
       loading = true;
     });
-    final response = await httpRequests.put();
-    ErrorHandler errorHandler = ErrorHandler(response: response);
-    if(!errorHandler.hasError){
-      Map jsonResult = json.decode(response.body);
-       Map<String, dynamic> userData = {};
-       userData.addAll(jsonResult["data"]["profile"]);
-       userData["meta"] = null;
-       userData.addAll(jsonResult["data"]["profile"]["meta"]);
-       Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false).setUserData(userData);
-      callback();
-      setState(() {
-        loading = false;
-      });
-    }
-    else{
-      Fluttertoast.showToast(msg: errorHandler.errorMessage ,backgroundColor: Colors.red.withOpacity(0.7), textColor: Colors.white);
-      setState(() {
-        loading = false;
-      });
-    }
+    updateUserData(updateData, setStateWithStatus, context, callback);
+  }
+
+  void setStateWithStatus(bool status){
+    setState(() {
+      loading = status;
+    });
   }
 
   @override

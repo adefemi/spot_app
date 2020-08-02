@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:spot_app/components/bgColorLayer.dart';
@@ -10,6 +9,7 @@ import 'package:spot_app/components/headingRole.dart';
 import 'package:spot_app/components/phoneInputField.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,19 +35,26 @@ class _AboutCompanyState extends State<AboutCompany> {
   }
 
   void submit(Function callback) async {
-
-//    if(companyName == null || companyLocation == null || _logo == null){
-//      Fluttertoast.showToast(msg: "Fill all fields to proceed...", backgroundColor: Colors.red, textColor: Colors.white);
-//      return;
-//    }
+    if(companyName == null || companyLocation == null || _logo == null){
+      Fluttertoast.showToast(msg: "Fill all fields to proceed...", backgroundColor: Colors.red, textColor: Colors.white);
+      return;
+    }
     setState(() {
       loading = true;
     });
-    Future.delayed(Duration(milliseconds: 1000), (){
-      setState(() {
-        loading = false;
-      });
-      callback();
+    var logoData = await uploadImage(_logo.path);
+    if(logoData == "false")return;
+    Map updateData = {
+      "companyName": companyName,
+      "companyLocation": companyLocation,
+      "logo": logoData
+    };
+    updateUserData(updateData, setStateWithStatus, context, callback);
+  }
+
+  void setStateWithStatus(bool status){
+    setState(() {
+      loading = status;
     });
   }
 

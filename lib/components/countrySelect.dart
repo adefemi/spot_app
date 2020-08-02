@@ -15,20 +15,12 @@ Widget countryPicker(){
     showOnlyCountryWhenClosed: false,
     // optional. aligns the flag and the Text left
     alignLeft: false,
-    flagWidth: 50,
+    flagWidth: 20,
     padding: EdgeInsets.symmetric(horizontal: 0),
     textStyle: TextStyle(
         fontFamily: fonts.qanelas,
         fontSize: 17,
         color: colors.blueColor
-    ),
-    flagConWidth: 30,
-    flagConHeight: 30,
-    flagConPadH: 6,
-    flagConPadV: 2,
-    containerDecoration: BoxDecoration(
-        color: colors.lightBlack,
-        borderRadius: BorderRadius.circular(50)
     ),
   );
 }

@@ -89,69 +89,8 @@ class _SplashSubState extends State<SplashSub> {
     "assets/pngs/splashIcon3.png",
   ];
 
-  String verifyRole(String roleId){
-    List roles = Provider.of<SystemMount>(context, listen: false).roles;
-    List filtered = roles.where((item) => item["id"] == roleId).toList();
-    if(filtered[0]["name"].toString().toLowerCase() == spotRoles.spotter.toLowerCase()){
-      return spotRoles.spotter;
-    }
-    else if(filtered[0]["name"].toString().toLowerCase() == spotRoles.merchant.toLowerCase()){
-      return spotRoles.merchant;
-    }
-
-    return null;
-  }
-
   void moveToPhoneSetup() async {
-    if(loading){
-      return;
-    }
-    setState(() {
-      loading = true;
-    });
-    // check if user already has enrolled...
     navigateToSetUp();
-    return;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString(spotPrefs.token);
-    if(token != null){
-      final header = networkData.setHeader(userBearer: true, token: token);
-      HttpRequests httpRequests = HttpRequests(url: networkData.getMe(), headers: header);
-      Response response = await httpRequests.get();
-      ErrorHandler errorHandler = ErrorHandler(response: response);
-      if(!errorHandler.hasError){
-        Map body = json.decode(response.body) as Map;
-        Map profileData = body["data"]["profile"];
-        String roleId = body["data"]["roleId"];
-        String role = verifyRole(roleId);
-        if(role == null){
-          Fluttertoast.showToast(msg: "User role not found...");
-          navigateToSetUp();
-        }
-        UserOnBoardChangeNotifierModel userOnBoardChangeNotifierModel = Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false);
-        userOnBoardChangeNotifierModel.changeRole(role, roleId);
-        Map<String, dynamic> userData = {};
-        userData.addAll(profileData);
-        userData["meta"] = null;
-        userData.addAll(profileData["meta"]);
-        userOnBoardChangeNotifierModel.setUserData(userData);
-        if(role == spotRoles.spotter){
-          if(userData["name"] == null){
-            Fluttertoast.showToast(msg: "You need to add up your name");
-            Navigator.of(context).pushNamed("/aboutUser");
-          }
-          else{
-            Navigator.of(context).pushNamed("/searchOffer");
-          }
-        }
-      }
-      else{
-
-      }
-    }
-    else{
-      navigateToSetUp();
-    }
   }
 
   void navigateToSetUp(){
@@ -160,7 +99,7 @@ class _SplashSubState extends State<SplashSub> {
 
   @override
   Widget build(BuildContext context) {
-    final splashContentHeight = getSize(context, getHeight(context)/2);
+    final splashContentHeight = getSize(context, getHeight(context)/getSize(context, 2));
     return Scaffold(
       backgroundColor: colors.lightBlur.withOpacity(0.98),
       body: SizedBox.expand(
@@ -291,8 +230,8 @@ class _SplashSubState extends State<SplashSub> {
                                         moveToPhoneSetup();
                                       } :goNext,
                                       child: Container(
-                                        width: 118,
-                                        height: 62,
+                                        width: getSize(context, 118),
+                                        height: getSize(context, 62),
                                         decoration: BoxDecoration(
                                             color: colors.blueColor,
                                             borderRadius: BorderRadius.circular(getSize(context, 40))

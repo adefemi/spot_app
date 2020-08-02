@@ -8,12 +8,14 @@ import 'package:spot_app/components/bgColorLayer.dart';
 import 'package:spot_app/components/button.dart';
 import 'package:spot_app/components/headingRole.dart';
 import 'package:spot_app/components/headingRole2.dart';
+import 'package:spot_app/components/loader.dart';
 import 'package:spot_app/components/phoneInputField.dart';
 import 'package:spot_app/components/selectRoleBox.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
 import 'package:spot_app/models/errorHandler.dart';
 import 'package:spot_app/models/options.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
 import 'package:spot_app/network/data.dart';
 import 'package:spot_app/network/requestManage.dart';
 import 'package:spot_app/provider/userOnBoardModel.dart';
@@ -33,10 +35,13 @@ class UserInterest extends StatefulWidget {
 class _UserInterestState extends State<UserInterest> {
   bool disabled = true;
   bool loading = false;
+  bool fetching = true;
   String userName = "";
   List selectedInterest = [];
   String errorText;
   FocusNode inputFocus = FocusNode();
+  var categories = [];
+  List<String> categoriesMain = [];
 
   void onChange(val){
     setState(() {
@@ -46,6 +51,16 @@ class _UserInterestState extends State<UserInterest> {
 
   void initState(){
     super.initState();
+    setupCategories();
+  }
+
+  void setupCategories() async{
+    Map data = await fetchCategories(context);
+    setState(() {
+      categories = data["data"];
+      categoriesMain = data["newData"];
+      fetching = false;
+    });
   }
 
   void submit(Function callback) async{
@@ -62,6 +77,26 @@ class _UserInterestState extends State<UserInterest> {
     }
     setState(() {
       selectedInterest = selectedInterest;
+    });
+  }
+
+  void saveInterests(Function callBack){
+    List selectedCategory = [];
+
+    for(int i = 0; i<categories.length; i++){
+      if(selectedInterest.contains(i)){
+        selectedCategory.add(categories[i]);
+      }
+    }
+    var data = {
+      "interests": selectedCategory
+    };
+    updateUserData(data, setStateWithStatus, context, callBack);
+  }
+
+  void setStateWithStatus(bool status){
+    setState(() {
+      loading = status;
     });
   }
 
@@ -91,57 +126,61 @@ class _UserInterestState extends State<UserInterest> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        bgColorLayer(),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: getWidth(context) / 10
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(height: getSize(context, 50),),
-                  headingRole(context, canGoBack: true, child: headingRole2(context, "Interests", canGoBack: true, colorMain: colors.blueColor)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: getSize(context, 10)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(height: getSize(context, 30),),
-                        textControl("My Interests", context, size: getSize(context, 25), fontWeight: FontWeight.w700),
-                        SizedBox(height: getSize(context, 10),),
-                        circle(getSize(context, 10), color: colors.pinkColor),
-                        SizedBox(height: getSize(context, 20),),
-                      ],
+    return WillPopScope(
+      onWillPop: () => willPopController(context),
+      child: Stack(
+        children: <Widget>[
+          bgColorLayer(),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Container(
+              padding: EdgeInsets.symmetric(
+                  horizontal: getWidth(context) / 10
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(height: getSize(context, 50),),
+                    headingRole(context, canGoBack: true, child: headingRole2(context, "Interests", canGoBack: true, colorMain: colors.blueColor)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: getSize(context, 10)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: getSize(context, 30),),
+                          textControl("My Interests", context, size: getSize(context, 25), fontWeight: FontWeight.w700),
+                          SizedBox(height: getSize(context, 10),),
+                          circle(getSize(context, 10), color: colors.pinkColor),
+                          SizedBox(height: getSize(context, 20),),
+                        ],
+                      ),
                     ),
-                  ),
-                  textInputField(context, borderRadius: getSize(context, 16), height: getSize(context, 67), placeholder: "Search Interests", focusNode: inputFocus, onChange: onChange, errorText: errorText),
-                  SizedBox(height: getSize(context, 30),),
-                  Wrap(
-                    children: getInterests(interestList),
-                  ),
-                  SizedBox(height:getSize(context, 80),),
-                  Center(
-                    child:  simpleButton("Find Offers", context,
-                      color: Colors.white,
-                      backColor: colors.blueColor,
-                      fontWeight: FontWeight.w500,
-                      onTap: (){
-                        Navigator.of(context).pushReplacementNamed("/searchOffer");
-                      }
-                    )
-                  ),
-                  SizedBox(height:getSize(context, 50),),
-                ],
+                    textInputField(context, borderRadius: getSize(context, 16), height: getSize(context, 67), placeholder: "Search Interests", focusNode: inputFocus, onChange: onChange, errorText: errorText),
+                    SizedBox(height: getSize(context, 30),),
+                    Wrap(
+                      children: getInterests(categoriesMain),
+                    ),
+                    SizedBox(height:getSize(context, 80),),
+                    Center(
+                        child:  simpleButton("Find Offers", context,
+                            color: Colors.white,
+                            backColor: colors.blueColor,
+                            loading: loading,
+                            fontWeight: FontWeight.w500,
+                            disabled: selectedInterest.length < 1 || loading,
+                            onTap: () => saveInterests(() => Navigator.of(context).pushReplacementNamed("/searchOffer"))
+                        )
+                    ),
+                    SizedBox(height:getSize(context, 50),),
+                  ],
+                ),
               ),
             ),
           ),
-        )
-      ],
+          loaderMain(context, status: fetching)
+        ],
+      ),
     );
   }
 }

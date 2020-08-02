@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:spot_app/components/headingRole.dart';
 import 'package:spot_app/components/phoneInputField.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/models/errorHandler.dart';
 import 'package:spot_app/network/data.dart';
 import 'package:spot_app/network/requestManage.dart';
 import 'package:spot_app/provider/userOnBoardModel.dart';
@@ -22,14 +24,28 @@ class PhoneSetup extends StatefulWidget {
 
 class _PhoneSetupState extends State<PhoneSetup> {
   String value = "";
-  bool isCorrect = true;
+  bool isCorrect = false;
+  bool loading = false;
   String countryCode = "234";
 
-  void submit(Function callback){
-    callback();
-    return;
+  void submit(Function callback, UserOnBoardChangeNotifierModel model) async{
+    setState(() {
+      loading = true;
+    });
     String newValue = countryCode + value.replaceAll(" ", "");
     Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false).setPhoneNumber(newValue);
+
+    // create user if not exist
+    Map userData = {
+      "name": "",
+      "phoneNumber": newValue,
+      "roleId": model.activeRoleId,
+      "verificationType": "phone"
+    };
+
+    HttpRequests httpRequests = HttpRequests(url: networkData.getUsersUrl(), body: userData, headers: networkData.headers);
+    final response = await httpRequests.post();
+    ErrorHandler(response: response);
 
     // verify phone number
     Map verificationData = {
@@ -38,8 +54,11 @@ class _PhoneSetupState extends State<PhoneSetup> {
       "createIfNotExist": "true"
     };
 
-    HttpRequests httpRequests = HttpRequests(url: networkData.getVerifyPhoneUrl(), body: verificationData, headers: networkData.headers );
+    httpRequests = HttpRequests(url: networkData.getVerifyPhoneUrl(), body: verificationData, headers: networkData.headers );
     httpRequests.post();
+    setState(() {
+      loading = false;
+    });
     callback();
   }
 
@@ -94,19 +113,27 @@ class _PhoneSetupState extends State<PhoneSetup> {
                            tag: "goOTP",
                            child: Material(
                              type: MaterialType.transparency,
-                             child: simpleButton("Continue", context,
-                                 color: Colors.white.withOpacity(0.9),
-                                 backColor: !isCorrect ? Colors.grey : colors.blueColor,
-                                 fontWeight: FontWeight.w500,
-                               onTap: (){
-                                 if(!isCorrect){
-                                   Fluttertoast.showToast(msg: "Phone number entry not complete");
+                             child:  Consumer<UserOnBoardChangeNotifierModel>(
+                                 builder: (context, model, child){
+                                   return Material(
+                                     type: MaterialType.transparency,
+                                     child: simpleButton("Continue", context,
+                                         loading: loading,
+                                         color: Colors.white.withOpacity(0.9),
+                                         backColor: !isCorrect ? Colors.grey : colors.blueColor,
+                                         fontWeight: FontWeight.w500,
+                                         onTap: (){
+                                           if(!isCorrect){
+                                             Fluttertoast.showToast(msg: "Phone number entry not complete");
+                                           }
+                                           else{
+                                             // call verify phone end point
+                                             submit(() => Navigator.of(context).pushNamed("/otpSetup"), model);
+                                           }
+                                         }
+                                     ),
+                                   );
                                  }
-                                 else{
-                                   // call verify phone end point
-                                   submit(() => Navigator.of(context).pushNamed("/otpSetup"));
-                                 }
-                               }
                              ),
                            ),
                          )

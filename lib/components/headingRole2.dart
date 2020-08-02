@@ -3,7 +3,7 @@ import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 import 'package:spot_app/utils/helpers.dart';
 
-Widget headingRole2(BuildContext context, String title, {Function togNav, Color colorMain, bool canGoBack: false, bool solid: false, double fontSize: 18}){
+Widget headingRole2(BuildContext context, String title, {Function togNav, Color colorMain, bool canGoBack: false, bool solid: false, double fontSize: 18, String avatar}){
   Color color = Colors.white;
   if(colorMain != null){
     color = colorMain;
@@ -31,7 +31,7 @@ Widget headingRole2(BuildContext context, String title, {Function togNav, Color 
       Row(
         children: <Widget>[
           CircleAvatar(
-            backgroundImage:NetworkImage("https://cdn.pixabay.com/photo/2016/08/28/13/12/secondlife-1625903_960_720.jpg"),
+            backgroundImage:NetworkImage(avatar != null ? avatar : "https://cdn.pixabay.com/photo/2017/06/02/19/12/broken-link-2367103_960_720.png"),
           ),
           SizedBox(width: getSize(context, 10),),
           GestureDetector(

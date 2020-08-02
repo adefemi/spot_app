@@ -24,7 +24,7 @@ class OtpSetup extends StatefulWidget {
 }
 
 class _OtpSetupState extends State<OtpSetup> {
-  bool disabled = false;
+  bool disabled = true;
   int activeIndex = 1;
   String otp = "";
   FocusNode myFocusNode1 = FocusNode();
@@ -75,8 +75,6 @@ class _OtpSetupState extends State<OtpSetup> {
   }
 
   void submit(Function callback, UserOnBoardChangeNotifierModel model) async {
-    callback();
-    return;
     setState(() {
       loading = true;
     });
@@ -97,9 +95,13 @@ class _OtpSetupState extends State<OtpSetup> {
       Map userData = jsonResult["data"]["user"];
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.clear();
+      model.setToken(jsonResult["data"]["token"].toString());
       prefs.setString(spotPrefs.token, jsonResult["data"]["token"].toString());
       prefs.setString(spotPrefs.spotId, userData["id"].toString());
-      prefs.setString(spotPrefs.userId, userData["userId"].toString());
+      UserOnBoardChangeNotifierModel userOnBoardChangeNotifierModel = Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false);
+      userOnBoardChangeNotifierModel.setUserData(userData);
+      userOnBoardChangeNotifierModel.setToken(jsonResult["data"]["token"].toString());
+
       callback();
     }
     else{

@@ -6,7 +6,7 @@ import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 import 'package:spot_app/utils/helpers.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:qr_code_scanner/qr_scanner_overlay_shape.dart';
+//import 'package:qr_code_scanner/qr_scanner_overlay_shape.dart';
 
 
 class BarcodeScannerMain extends StatefulWidget {

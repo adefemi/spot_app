@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skeleton_text/skeleton_text.dart';
 import 'package:spot_app/components/alertViewer.dart';
 import 'package:spot_app/components/bgColorLayer.dart';
 import 'package:spot_app/components/button.dart';
@@ -8,6 +10,8 @@ import 'package:spot_app/components/headingRole2.dart';
 import 'package:spot_app/components/insertContent.dart';
 import 'package:spot_app/components/offerCard.dart';
 import 'package:spot_app/components/textControl.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
+import 'package:spot_app/provider/userOnBoardModel.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/fonts.dart';
 import 'package:spot_app/utils/helpers.dart';
@@ -22,16 +26,40 @@ class Explore extends StatefulWidget {
 
 class _ExploreState extends State<Explore> with TickerProviderStateMixin {
 
+  String activeInterest = "";
   bool status = false;
-  String activeImage = "";
+  bool fetching = true;
+  Map<String, dynamic> activeDeal = {};
+  List<dynamic> deals = [];
 
-  gotoDeal({int id: 0}){
-    Navigator.of(context).pushNamed("/productView");
+  gotoDeal({String id: ""}){
+    Navigator.of(context).pushNamed("/productView", arguments: {"id": id});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getDeals();
+  }
+
+  void getDeals() async {
+    UserOnBoardChangeNotifierModel userOnBoardChangeNotifierModel = Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false);
+    setState(() {
+      activeInterest = userOnBoardChangeNotifierModel.activeCat["name"];
+    });
+    String extra = "?categoryId=${userOnBoardChangeNotifierModel.activeCat["id"]}";
+    List<dynamic> _deals = await fetchDeals(context, extra: extra);
+    printWrapped(_deals.toString());
+    setState(() {
+      deals = _deals;
+      fetching = false;
+    });
   }
 
   setActiveProduct(e){
     setState(() {
-      activeImage = e;
+      activeDeal = e;
       status = true;
     });
   }
@@ -40,9 +68,34 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
     Navigator.of(context).pushNamed("/chatPad");
   }
 
+  List<Widget> getDealContent(){
+    List<Widget> _tempHolder = [];
+    for(int i = 0; i<deals.length; i++){
+      _tempHolder.add(
+          exploreCard(context, image: deals[i]["images"][0], onChat: goChat, onView: () => gotoDeal(id: deals[i]["id"]), cat: activeInterest,
+              name: deals[i]["title"], price: "N${deals[i]["amount"]}", onPin: (e) => setActiveProduct(deals[i]))
+      );
+    }
+    if(_tempHolder.length < 1){
+      _tempHolder.add(
+        Container(
+            width: getWidth(context),
+            height: getHeight(context),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(getSize(context, 30)),
+              color: Colors.white,
+            ),
+            child: Center(
+              child: textControl("We couldn't find any deals", context),
+            ),
+        )
+      );
+    }
+    return _tempHolder;
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Container(
       child: SizedBox.expand(
         child: Stack(
@@ -60,33 +113,23 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                 ),
-                body: ExploreView(
-                  [
-                    exploreCard(context, image: "https://pngimg.com/uploads/running_shoes/running_shoes_PNG5827.png", onChat: goChat, onView: gotoDeal,
-                        name: "Nike  Max", price: "N20,000", onPin: (e) => setActiveProduct("https://pngimg.com/uploads/running_shoes/running_shoes_PNG5827.png")),
-                    exploreCard(context, image: "https://www.searchpng.com/wp-content/uploads/2019/01/Nike-Shoe-PNG-715x715.png", onChat: goChat, onView: gotoDeal,
-                        name: "Nike Air Max", price: "N25,000", onPin: (e) => setActiveProduct("https://www.searchpng.com/wp-content/uploads/2019/01/Nike-Shoe-PNG-715x715.png")),
-                    exploreCard(context, image: "https://www.pngmart.com/files/1/Nike-Shoes-Transparent-Background.png", onChat: goChat, onView: gotoDeal,
-                        name: "Nike Air Max", price: "N29,000", onPin: (e) => setActiveProduct("https://www.pngmart.com/files/1/Nike-Shoes-Transparent-Background.png")),
-                    exploreCard(context, image: "https://www.pngitem.com/pimgs/m/194-1944024_transparent-gym-shoes-png-popular-80s-shoes-men.png", onChat: goChat, onView: gotoDeal,
-                        name: "Adidas Gym Max", price: "N22,000", onPin: (e) => setActiveProduct("https://www.pngitem.com/pimgs/m/194-1944024_transparent-gym-shoes-png-popular-80s-shoes-men.png")),
-                    exploreCard(context, image: "https://www.transparentpng.com/thumb/adidas-shoes/a4xO3G-adidas-shoes-adidas-shoe-kids-superstar-daddy-grade.png",  onChat: goChat, onView: gotoDeal,
-                        name: "Adidas Max", price: "N28,000", onPin: (e) => setActiveProduct(e)),
-                    exploreCard(context, image: "https://www.pngitem.com/pimgs/m/114-1149906_sneakers-skate-shoe-nike-one-transparent-background-png.png",  onChat: goChat, onView: gotoDeal,
-                        name: "Nike Sneakers", price: "N30,000", onPin: (e) => setActiveProduct(e)),
-                    exploreCard(context, image: "https://www.alisuperprice.com/wp-content/uploads/revslider/home-v10-slider/shoe.png", onChat: goChat, onView: gotoDeal,
-                        name: "RevSlider Max", price: "N23,000", onPin: (e) => setActiveProduct(e)),
-                    exploreCard(context, image: "https://www.freeiconspng.com/uploads/running-shoes-images-download-29.png", onChat: goChat, onView: gotoDeal,
-                        name: "Nike Air Max", price: "N48,000", onPin: (e) => setActiveProduct(e)),
-                  ],
-                  context
+                body: fetching ? SkeletonAnimation(
+                  child: Container(
+                    width: getWidth(context),
+                    height: getHeight(context),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(getSize(context, 30)),
+                      color: Colors.grey[300],
+                    ),
+                  ),
                 )
+                    : ExploreView(getDealContent(), context, deals.length < 1 ? false : true)
             ),
             alertViewer(context, status: status, closeAlert: (){
               setState(() {
                 status = false;
               });
-            }, child: productConfirmation(context, image: activeImage))
+            }, child: productConfirmation(context, activeDeal: activeDeal, interest: activeInterest))
           ],
         ),
       ),
@@ -94,7 +137,10 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
   }
 }
 
-Widget productConfirmation(BuildContext context, {String image: ""}){
+Widget productConfirmation(BuildContext context, {String interest = "", Map<String, dynamic> activeDeal}){
+  if(activeDeal["id"] == null){
+    return SizedBox();
+  }
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -104,17 +150,17 @@ Widget productConfirmation(BuildContext context, {String image: ""}){
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           insertContent(context, width: 100, height:35, borderRadius: 35,
-              child: textControl("Sport", context,color: Colors.white, size: 13, fontWeight: FontWeight.w500, font: fonts.proxima)),
-          textControl("Listed 21 Mar", context, size: 13, color: Colors.black.withOpacity(0.3), font: fonts.proxima, fontWeight: FontWeight.w500),
+              child: textControl(interest, context,color: Colors.white, size: 13, fontWeight: FontWeight.w500, font: fonts.proxima)),
+          textControl("Listed ${activeDeal["startDate"]}", context, size: 13, color: Colors.black.withOpacity(0.3), font: fonts.proxima, fontWeight: FontWeight.w500),
         ],
       ),
       SizedBox(height: getSize(context, 20),),
-      offerCard(context, title: "Pink Nike Air Max", image: image),
+      offerCard(context, title: activeDeal["title"], image: activeDeal["images"][0]),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           textControl("TOTAL", context, color: colors.deepPink.withOpacity(0.6), size: 11,fontWeight: FontWeight.bold, spacing: 5),
-          textControl("N10,000", context, color: colors.blueColor.withOpacity(0.8), size: 18,fontWeight: FontWeight.bold),
+          textControl("N${activeDeal["amount"]}", context, color: colors.blueColor.withOpacity(0.8), size: 18,fontWeight: FontWeight.bold),
         ],
       ),
       SizedBox(height: getSize(context, 20),),
@@ -124,7 +170,7 @@ Widget productConfirmation(BuildContext context, {String image: ""}){
           type: MaterialType.transparency,
           child: simpleButton("Make Payment",
               context, color: Colors.white.withOpacity(0.9), onTap: (){
-                Navigator.of(context).pushNamed("/payment");
+                Navigator.of(context).pushNamed("/payment", arguments: {"id": activeDeal["id"]});
               },
               padH: double.infinity),
         ),

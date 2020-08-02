@@ -4,6 +4,7 @@ import 'package:spot_app/components/headingRole.dart';
 import 'package:spot_app/components/sideBarLinks.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/helpers.dart';
 
@@ -110,14 +111,14 @@ class _SideBarControl2State extends State<SideBarControl2> with TickerProviderSt
                       headingRole(context, isSideBar: true, goBack: goBack),
                     ],
                   ),
-                  textControl("Temi Adele", context, size: getSize(context, 20), fontWeight: FontWeight.w600, color: Colors.white),
+                  textControl(activeUser(context, content:"name"), context, size: getSize(context, 20), fontWeight: FontWeight.w600, color: Colors.white),
                  Column(
                    children: <Widget>[
                      sideBarLinks(
                          context,
                          icon: "gps.svg",
                          title: "Find New Deal",
-                         onTap: () => gotoPage(context, "/searchOffer")
+                         onTap: () => gotoPage(context, "/searchOffer", repNamed: false)
                      ),
                      sideBarLinks(
                          context,
@@ -143,6 +144,12 @@ class _SideBarControl2State extends State<SideBarControl2> with TickerProviderSt
                          title: "History",
                          onTap: () => gotoPage(context, "/dashboard", extra: 3)
                      ),
+                     sideBarLinks(
+                         context,
+                         icon: "shop.svg",
+                         title: "Malls",
+                         onTap: () => gotoPage(context, "/mall", repNamed: false)
+                     ),
                      SizedBox(height: getHeight(context)/20,),
                    ],
                  ),
@@ -150,7 +157,7 @@ class _SideBarControl2State extends State<SideBarControl2> with TickerProviderSt
                       context,
                       icon: "setting.svg",
                       title: "Settings",
-                      onTap: () => gotoPage(context, "/settingsTenant")
+                      onTap: () => gotoPage(context, "/settingsTenant", repNamed: false)
                   ),
                 ],
               ),

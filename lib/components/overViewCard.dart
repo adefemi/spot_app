@@ -1,11 +1,12 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/helpers.dart';
 
-Widget overViewCard(BuildContext context, String count, String title, Color color, {bool isFirst: false, bool isLast: false, bool zero: false, Function onTap}){
+Widget overViewCard(BuildContext context, String count, String title, Color color, {bool isFirst: false, bool isLast: false, bool zero: false, Function onTap, bool loading = false}){
   return GestureDetector(
     onTap: onTap,
     child: Stack(
@@ -31,7 +32,8 @@ Widget overViewCard(BuildContext context, String count, String title, Color colo
                     children: <Widget>[
                       Container(
                         child: Center(
-                          child: textControl(count, context, size: getSize(context, 20), fontWeight: FontWeight.bold, color: Colors.white),
+                          child: loading ? SpinKitRing(color: Colors.white, size: getSize(context, 15),) :
+                          textControl(count, context, size: getSize(context, 20), fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                         width: getSize(context, zero ? 80 : 40),
                         height: getSize(context, zero ? 80 : 40),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/utils/colors.dart';
-import 'package:spot_app/utils/fonts.dart';
 import 'package:spot_app/utils/helpers.dart';
 
 Widget insertContent(BuildContext context, {double height: 40,double width: 40, Color color, Widget child, Function onTap, double borderRadius: 6}){

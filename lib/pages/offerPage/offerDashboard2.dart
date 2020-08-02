@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spot_app/components/bgColorLayer.dart';
 import 'package:spot_app/components/headingRole2.dart';
 import 'package:spot_app/components/offerCard.dart';
 import 'package:spot_app/components/overViewCard.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
+import 'package:spot_app/provider/userOnBoardModel.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/helpers.dart';
 
@@ -19,8 +22,16 @@ class OfferDashboard2 extends StatefulWidget {
 }
 
 class _OfferDashboard2State extends State<OfferDashboard2> {
-  gotoDeals(String type){
-    Navigator.of(context).pushNamed("/explore", arguments: {"type": type});
+  Map<String, dynamic> interestSummary = {};
+  bool fetchingSummary = true;
+
+  gotoDeals(String type, String catId){
+    UserOnBoardChangeNotifierModel userOnBoardChangeNotifierModel = Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false);
+    userOnBoardChangeNotifierModel.setActiveCatId({
+      "name": type,
+      "id": catId
+    });
+    Navigator.of(context).pushNamed("/explore");
   }
 
   gotoDeal(int id){
@@ -28,7 +39,98 @@ class _OfferDashboard2State extends State<OfferDashboard2> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getInterestSummary();
+  }
+
+  getInterestSummary() async{
+    String interestId = "";
+    List<dynamic> interestObj = activeUser(context, content: "interests") as List<dynamic>;
+    for(int i = 0; i<interestObj.length; i++){
+      interestId += interestObj[i]["id"].toString();
+      if(i != interestObj.length - 1){
+        interestId += ", ";
+      }
+    }
+    List<dynamic> data = await fetchDealsSummary(context, "?interests=$interestId");
+    Map<String, dynamic> _tempSummary = {};
+    for(int j = 0; j<data.length; j++){
+      _tempSummary[data[j]["category"]] = data[j]["numberOfDeals"];
+    }
+    setState(() {
+      interestSummary = _tempSummary;
+      fetchingSummary = false;
+    });
+  }
+
+  Color getColor(int index){
+    List<dynamic> colorsList = [
+      colors.pinkColor,
+      colors.blueDark,
+      colors.blueColor,
+      colors.deepPink,
+    ];
+    try{
+      return colorsList[index];
+    }catch(e){
+      return Colors.grey;
+    }
+  }
+
+  List<Widget> getInterestBody(){
+    List<Widget> _tempHolder = [];
+    List<dynamic> userInterests = activeUser(context, content: "interests");
+
+    int start = 0;
+    int end = userInterests.length > 2 ? 2 : userInterests.length;
+    int count = 0;
+    for(int j = 0; j<userInterests.length; j++){
+      count++;
+      if(count == 1){
+        _tempHolder.add(
+            Container(
+                padding: EdgeInsets.symmetric(horizontal: getWidth(context)/15),
+                height: getSize(context, 220),
+                child: Flex(
+                  direction: Axis.horizontal,
+                  children: userInterests.sublist(start, end).asMap().map((i, e){
+                    return MapEntry(i, Flexible(
+                      flex: 1,
+                      fit: FlexFit.tight,
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            right: getSize(context, i == 0 ? 7.5 : 0),
+                            left: getSize(context, i != 0 ? 7.5 : 0)
+                        ),
+                        child: overViewCard(
+                            context, interestSummary[e["name"]] == null ? "0" : interestSummary[e["name"]].toString(), e["name"], getColor(j+i), zero: true, loading: fetchingSummary,
+                            onTap: (){gotoDeals(e["name"], e["id"]);}
+                        ),
+                      ),
+                    ));
+                  }).values.toList(),
+                )
+            )
+        );
+
+        _tempHolder.add(SizedBox(height: getSize(context, 15),));
+      }
+      if(count == 2){
+        start = start + count;
+        end = userInterests.length > start + 2 ? start + 2 : userInterests.length;
+        count = 0;
+      }
+    }
+
+    return _tempHolder;
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+
     return SizedBox.expand(
       child: Stack(
         children: <Widget>[
@@ -39,7 +141,7 @@ class _OfferDashboard2State extends State<OfferDashboard2> {
               automaticallyImplyLeading: false,
               title: Padding(
                 padding: EdgeInsets.symmetric(horizontal: getWidth(context)/15),
-                child: headingRole2(context, "Hello World", togNav: widget.showSideBar, colorMain: colors.blueColor, solid: true),
+                child: headingRole2(context, activeUser(context, content: "name"), togNav: widget.showSideBar, colorMain: colors.blueColor, solid: true),
               ),
               elevation: 0,
               backgroundColor: Colors.transparent,
@@ -63,49 +165,8 @@ class _OfferDashboard2State extends State<OfferDashboard2> {
                     child: circle(getSize(context, 10), color: colors.pinkColor),
                   ),
                   SizedBox(height: getSize(context, 20),),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: getWidth(context)/15),
-                    height: getSize(context, 220),
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      children: <Widget>[
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: overViewCard(
-                              context, "4", "Sports", colors.pinkColor, zero: true,
-                            onTap: (){gotoDeals("Sports");}
-                          ),
-                        ),
-                        SizedBox(width: getSize(context, 15),),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: overViewCard(context, "2", "Electronics", colors.blueDark, zero: true, onTap: (){gotoDeals("Electronics");}),
-                        ),
-                      ],
-                    )
-                  ),
-                  SizedBox(height: getSize(context, 15),),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: getWidth(context)/15),
-                    height: getSize(context, 220),
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      children: <Widget>[
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: overViewCard(context, "1", "Automobiles", colors.blueColor, zero: true, onTap: (){gotoDeals("Automobiles");}),
-                        ),
-                        SizedBox(width: getSize(context, 15),),
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: SizedBox(),
-                        ),
-                      ],
-                    )
+                  Column(
+                    children: getInterestBody(),
                   ),
                   SizedBox(height: getSize(context, 30),),
                   Container(

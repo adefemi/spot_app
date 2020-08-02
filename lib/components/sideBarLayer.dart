@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:spot_app/components/headingRole.dart';
 import 'package:spot_app/components/sideBarLinks.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/provider/userOnBoardModel.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spot_app/utils/helpers.dart';
@@ -29,6 +31,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
     begin: 1.0,
     end: 0.5
   );
+  Map<String, dynamic> userData;
 
   RelativeRectTween relativeRectTween = RelativeRectTween(
     begin: RelativeRect.fromLTRB(0, 0, 0, 0),
@@ -46,6 +49,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
 
   initState() {
     super.initState();
+
     _controller = AnimationController(
         duration: const Duration(milliseconds: 300), vsync: this);
     _animation = CurvedAnimation(parent: _controller, curve: Curves.ease);
@@ -58,6 +62,9 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
         begin: RelativeRect.fromLTRB(0, 0, 0, 0),
         end: RelativeRect.fromLTRB(0, 0, -MediaQuery.of(context).size.width/2.5, 0),
       );
+    });
+    setState(() {
+      userData = Provider.of<UserOnBoardChangeNotifierModel>(context, listen: false).userData;
     });
   }
 
@@ -111,7 +118,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                       headingRole(context, isSideBar: true, goBack: goBack),
                     ],
                   ),
-                  textControl("Hassan Stores", context, size: getSize(context, 20), fontWeight: FontWeight.w600, color: Colors.white),
+                  textControl(userData["companyName"] == null ? "" : userData["companyName"], context, size: getSize(context, 20), fontWeight: FontWeight.w600, color: Colors.white),
                  Column(
                    children: <Widget>[
                      sideBarLinks(
@@ -130,7 +137,7 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                          context,
                          icon: "user.svg",
                          title: "Visiting Spotters",
-                         onTap: () => gotoPage(context, "/visiting", )
+                         onTap: () => gotoPage(context, "/visiting", repNamed: false)
                      ),
                      sideBarLinks(
                          context,
@@ -142,13 +149,13 @@ class _SideBarControlState extends State<SideBarControl> with TickerProviderStat
                          context,
                          icon: "barcode.svg",
                          title: "Scan Barcode",
-                         onTap: () => gotoPage(context, "/barcodeScanner")
+                         onTap: () => gotoPage(context, "/barcodeScanner", repNamed: false)
                      ),
                      sideBarLinks(
                          context,
                          icon: "addNew.svg",
                          title: "Create New Offer",
-                         onTap: () => gotoPage(context, "/newOffer")
+                         onTap: () => gotoPage(context, "/newOffer", repNamed: false)
                      ),
                      SizedBox(height: getHeight(context)/20,),
                    ],

@@ -37,9 +37,8 @@ class _SelectRoleState extends State<SelectRole> {
   }
 
   void selectRole(String activeRole, List roles, UserOnBoardChangeNotifierModel model){
-//    final roleObj = roles.where((item) => item["name"].toString().toLowerCase() == activeRole.toLowerCase()).toList()[0];
-//    model.changeRole(activeRole, roleObj["id"]);
-    model.changeRole(activeRole, _selectedRole);
+    final roleObj = roles.where((item) => item["name"].toString().toLowerCase() == activeRole.toLowerCase()).toList()[0];
+    model.changeRole(activeRole, roleObj["id"]);
   }
 
   Widget build(BuildContext context) {

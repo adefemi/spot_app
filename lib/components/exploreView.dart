@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/helpers.dart';
 
 class ExploreView extends StatefulWidget {
   final List<Widget> children;
+  final bool canSweep;
   final BuildContext context;
 
-  const ExploreView(this.children, this.context);
+  const ExploreView(this.children, this.context, this.canSweep);
 
   @override
   _ExploreViewState createState() => _ExploreViewState();
@@ -69,17 +71,23 @@ class _ExploreViewState extends State<ExploreView> with TickerProviderStateMixin
   }
 
   changeCard(val){
-    if(!canChange)return;
+    if(!canChange || !widget.canSweep)return;
     int newState = activeState;
     int newRect = activeRect;
 
     if(val == 0){
+//      Fluttertoast.showToast(msg: "Thats the last one");
+//
+//      if(newState == initial)return;
+
       newState = newState == initial ? max : newState - 1;
       newRect = newRect == initial ? max : newRect - 1;
       _activeOutRect = _outRect;
       _activeInRect = _inRect;
     }
     else{
+//      Fluttertoast.showToast(msg: "Thats the first one");
+//      if(newState == max)return;
       newState = newState == max ? initial : newState + 1;
       newRect = newRect == max ? initial : newRect + 1;
       _activeOutRect = _inRect2;

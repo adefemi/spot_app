@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:spot_app/components/bgColorLayer.dart';
 import 'package:spot_app/components/headingRole2.dart';
+import 'package:spot_app/components/loader.dart';
 import 'package:spot_app/components/offerCard.dart';
 import 'package:spot_app/components/overViewCard.dart';
 import 'package:spot_app/components/textControl.dart';
 import 'package:spot_app/components/three-circles.dart';
+import 'package:spot_app/network/customRequestHandler.dart';
 import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/helpers.dart';
+
 
 class OfferDashboard extends StatefulWidget {
   const OfferDashboard(this.showSideBar);
@@ -17,8 +20,58 @@ class OfferDashboard extends StatefulWidget {
 }
 
 class _OfferDashboardState extends State<OfferDashboard> {
+  bool fetching = true;
+  bool fetchingCounts = true;
+  Map<String, dynamic> dealSummary = {
+    "completed": "0",
+    "pending": "0",
+    "listed": "0"
+  };
+  List<dynamic> deals;
+
   gotoDeals(String type){
     Navigator.of(context).pushNamed("/offerDeal", arguments: {"type": type});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchDeals();
+    _fetchSummary();
+  }
+
+  void _fetchSummary() async{
+    dynamic pendingDeals = await fetchDeals(context, extra: "?status=PENDING", full: true);
+    dynamic approvedDeals = await fetchDeals(context, extra: "?status=APPROVED", full: true);
+//    dynamic completedDeals = await fetchDeals(context, extra: "?status=COMPLETED");
+
+    setState(() {
+      dealSummary = {
+        "completed": "0",
+        "pending": pendingDeals["recordsFiltered"].toString(),
+        "listed": approvedDeals["recordsFiltered"].toString()
+      };
+      fetchingCounts = false;
+    });
+  }
+
+  void _fetchDeals() async{
+    List<dynamic> _deals = await fetchDeals(context);
+    setState(() {
+      deals = _deals;
+      fetching = false;
+    });
+  }
+
+  List<Widget> getDeals(){
+    List<Widget> _tempHolder = [];
+    for(int i = 0; i<(deals.length > 5 ? 5 : deals.length); i++){
+      _tempHolder.add(
+          offerCard(context, date: deals[i]["startDate"], title: deals[i]["title"], image: deals[i]["images"][0])
+      );
+    }
+    return _tempHolder;
   }
 
   @override
@@ -63,7 +116,7 @@ class _OfferDashboardState extends State<OfferDashboard> {
                           flex: 1,
                           fit: FlexFit.tight,
                           child: overViewCard(
-                              context, "4", "Completed", colors.pinkColor, zero: true,
+                              context, dealSummary["completed"], "Completed", colors.pinkColor, zero: true, loading: fetchingCounts,
                             onTap: (){gotoDeals("completed");}
                           ),
                         ),
@@ -71,7 +124,8 @@ class _OfferDashboardState extends State<OfferDashboard> {
                         Flexible(
                           flex: 1,
                           fit: FlexFit.tight,
-                          child: overViewCard(context, "2", "Pending", colors.blueDark, zero: true, onTap: (){gotoDeals("pending");}),
+                          child: overViewCard(context, dealSummary["pending"], "Pending", colors.blueDark, loading: fetchingCounts,
+                              zero: true, onTap: (){gotoDeals("pending");}),
                         ),
                       ],
                     )
@@ -86,7 +140,8 @@ class _OfferDashboardState extends State<OfferDashboard> {
                         Flexible(
                           flex: 1,
                           fit: FlexFit.tight,
-                          child: overViewCard(context, "2", "Listed", colors.blueColor, zero: true, onTap: (){gotoDeals("approved");}),
+                          child: overViewCard(context, dealSummary["listed"], "Approved", colors.blueColor, loading: fetchingCounts,
+                              zero: true, onTap: (){gotoDeals("approved");}),
                         ),
                         SizedBox(width: getSize(context, 15),),
                         Flexible(
@@ -116,10 +171,8 @@ class _OfferDashboardState extends State<OfferDashboard> {
                           ],
                         ),
                         SizedBox(height: getSize(context, 20),),
-                        offerCard(context, date: "12-06-19", title: "Pink Nike Air Max", image: "https://cdn.pixabay.com/photo/2018/09/30/21/28/sneakers-3714729__340.jpg"),
-                        offerCard(context, date: "12-06-19", title: "Pink Nike Air Max", image: "https://cdn.pixabay.com/photo/2018/09/30/21/28/sneakers-3714729__340.jpg"),
-                        offerCard(context, date: "12-06-19", title: "Pink Nike Air Max", image: "https://cdn.pixabay.com/photo/2018/09/30/21/28/sneakers-3714729__340.jpg"),
-                        SizedBox(height: getSize(context, 100),),
+                        fetching ? offerLoaders(context) : Column(children: getDeals(),),
+                        SizedBox(height: getSize(context, 120),),
                       ],
                     ),
                   ),

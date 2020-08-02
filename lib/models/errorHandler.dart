@@ -14,16 +14,28 @@ class ErrorHandler{
   }
 
   void validateResponse(){
-    if(response.statusCode.toString() == "200" || response.statusCode.toString() == "201"){
+    if(["200", "201", "202", "203"].contains(response.statusCode.toString())){
       return;
     }
     else{
       Map decodedResponse = json.decode(response.body) as Map;
+
       hasError = true;
-      try{
-        errorMessage = decodedResponse["error"];
-      }catch(e){
-        errorMessage = "An error occurred";
+      if(decodedResponse["error"] != null){
+        try{
+          errorMessage =  decodedResponse["error"]["responseMessage"];
+        }catch(e){
+          errorMessage = decodedResponse["error"];
+        }
+      }
+      else{
+        if(decodedResponse["data"] != null){
+          errorMessage = decodedResponse["data"];
+        }
+        else{
+          errorMessage = "An error occurred";
+        }
+
       }
     }
   }

@@ -11,8 +11,9 @@ import 'package:spot_app/utils/colors.dart';
 import 'package:spot_app/utils/helpers.dart';
 
 class StoreDashboard extends StatelessWidget {
-  const StoreDashboard(this.showSideBar);
+  const StoreDashboard(this.showSideBar, this.userData);
   final Function showSideBar;
+  final Map<String, dynamic> userData;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class StoreDashboard extends StatelessWidget {
             automaticallyImplyLeading: false,
             title: Padding(
               padding: EdgeInsets.symmetric(horizontal: getWidth(context)/15),
-              child: headingRole2(context, "Hassan Stores", togNav: showSideBar),
+              child: headingRole2(context, userData["companyName"], togNav: showSideBar, avatar: userData["logo"]),
             ),
             elevation: 0,
             backgroundColor: colors.blueColor,
